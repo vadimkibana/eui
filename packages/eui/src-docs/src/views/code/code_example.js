@@ -19,9 +19,21 @@ const codeSnippet = '<EuiCode>Text to be formatted</EuiCode>';
 
 import CodeBlock from './code_block';
 const codeBlockSource = require('!!raw-loader!./code_block');
-const codeBlockSnippet = `<EuiCodeBlock language="jsx" fontSize="m" paddingSize="m">
-  { \`/* I'm an example of JS */
-  import React from 'react';\` }
+const codeBlockSnippet = `<EuiCodeBlock language="esql" fontSize="m" paddingSize="m">
+// This is a comment
+FROM logs-endpoint METADATA test
+  | ROW a=[1,2,3], b="b", j=["a","b"]
+    /* This is a multiline
+       commnet */
+  | MV_EXPAND a
+  | WHERE process.name == "curl.exe" AND ?asdf == 123
+  | STATS bytes = (SUM(destination.bytes, true) BY destination.?asdf.asdf)::INTEGER
+  | EVAL kb =  bytes / 1024 * -1.23e12 + ?e
+  | SORT kb DESC
+  | LIMIT 10
+  | KEEP kb, destination.address
+  | GROK a """%{TIMESTAMP_ISO8601:date} %{IP:ip} %{EMAILADDRESS:email} %{NUMBER:num}"""
+  | KEEP date, ip, email, num
 </EuiCodeBlock>
 `;
 

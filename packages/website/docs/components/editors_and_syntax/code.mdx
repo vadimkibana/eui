@@ -56,18 +56,30 @@ export default () => (
 import React from 'react';
 import { EuiCodeBlock, EuiSpacer } from '@elastic/eui';
 
-const jsCode = `/* I'm an example of JS */
-import React from 'react';`;
+const jsCode = `// This is a comment
+FROM logs-endpoint METADATA test
+  | ROW a=[1,2,3], b="b", j=["a","b"]
+    /* This is a multiline
+       commnet */
+  | MV_EXPAND a
+  | WHERE process.name == "curl.exe" AND ?asdf == 123
+  | STATS bytes = (SUM(destination.bytes, true) BY destination.?asdf.asdf)::INTEGER
+  | EVAL kb =  bytes / 1024 * -1.23e12 + ?e
+  | SORT kb DESC
+  | LIMIT 10
+  | KEEP kb, destination.address
+  | GROK a """%{TIMESTAMP_ISO8601:date} %{IP:ip} %{EMAILADDRESS:email} %{NUMBER:num}"""
+  | KEEP date, ip, email, num`;
 
 export default () => (
   <>
-    <EuiCodeBlock language="jsx" fontSize="m" paddingSize="m">
+    <EuiCodeBlock language="esql" fontSize="m" paddingSize="m">
       {jsCode}
     </EuiCodeBlock>
 
     <EuiSpacer />
 
-    <EuiCodeBlock language="jsx" paddingSize="none" transparentBackground>
+    <EuiCodeBlock language="esql" paddingSize="none" transparentBackground>
       {jsCode}
     </EuiCodeBlock>
   </>
